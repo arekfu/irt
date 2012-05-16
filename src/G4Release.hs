@@ -175,14 +175,15 @@ licenseBoilerplate = "//\n\
 
 defaultGlobDeps :: [String]
 defaultGlobDeps = ["G4geometry", "G4global", "G4materials",
-                   "G4particles", "G4track"]
+                   "G4particles", "G4track", "G4intercoms"]
 
 defaultGranDeps :: [String]
 defaultGranDeps = ["G4baryons", "G4bosons", "G4geometrymng",
                    "G4globman", "G4hadronic_mgt", "G4hadronic_util",
                    "G4hadronic_xsect", "G4ions", "G4leptons",
                    "G4materials", "G4mesons", "G4partman",
-                   "G4procman", "G4track", "G4volumes"]
+                   "G4procman", "G4track", "G4volumes",
+                   "G4intercoms"]
 
 mkModuleDefinition :: FilePath -> FilePath -> String -> String -> [G4Module] -> IO G4Module
 mkModuleDefinition basedir pkgdir codename pkgname granularDeps = do
@@ -263,6 +264,7 @@ sourcesCMakeHeader = "#---------------------------------------------------------
 \include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/util/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/processes/management/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/track/include)\n\
+\include_directories(${CMAKE_SOURCE_DIR}/source/intercoms/include)\n\
 \\n\
 \#\n\
 \# Define the Geant4 Module.\n\
