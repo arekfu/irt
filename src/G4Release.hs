@@ -261,6 +261,8 @@ sourcesCMakeHeader = "#---------------------------------------------------------
 \include_directories(${CMAKE_SOURCE_DIR}/source/particles/management/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/cross_sections/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/management/include)\n\
+\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/binary_cascade/include)\n\
+\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/im_r_matrix/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/util/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/processes/management/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/track/include)\n\
