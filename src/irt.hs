@@ -32,14 +32,14 @@ g4release :: CmdOptions
 g4release = G4Release { gitRepo = def &= help "INCL++ Git repository path"
                       , ignoreGitModifications = False &= help "Ignore modifications in the Git tree"
                       , g4Tree = def &= help "Geant4 checkout (main level)"
-                      , g4options = [] &= help "(AllowAssert, NoG4Types, NoLicense, NoRevisionInfo)"
+                      , g4options = [] &= help "(AllowAssert, NoG4Types, NoLicense, RevisionInfo)"
                       }  &= help "Release INCL++ to Geant4"
 
 g4ablarelease :: CmdOptions
 g4ablarelease = G4AblaRelease { gitRepo = def &= help "INCL++ Git repository path (containing the ablaxx directory)"
                       , ignoreGitModifications = False &= help "Ignore modifications in the Git tree"
                       , g4Tree = def &= help "Geant4 checkout (main level)"
-                      , g4options = [] &= help "(AllowAssert, NoG4Types, NoLicense, NoRevisionInfo)"
+                      , g4options = [] &= help "(AllowAssert, NoG4Types, NoLicense, RevisionInfo)"
                       }  &= help "Release ABLAXX to Geant4"
 
 info :: CmdOptions

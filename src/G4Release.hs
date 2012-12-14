@@ -28,7 +28,7 @@ data G4Module = G4Module {
 data G4ReleaseOption = AllowAssert
                      | NoG4Types
                      | NoLicense
-                     | NoRevisionInfo
+                     | RevisionInfo
                      deriving (Show, Eq, Data, Typeable)
 
 identityTransform :: String -> IO String
@@ -44,9 +44,9 @@ transformFn g4options repo code =
       licenseInfoTransform = case elem NoLicense g4options of
         True -> identityTransform
         False -> (appendLicense licenseBoilerplate)
-      revisionInfoTransform = case elem NoRevisionInfo g4options of
-        True -> identityTransform
-        False -> (appendRevisionInfo repo)
+      revisionInfoTransform = case elem RevisionInfo g4options of
+        True -> (appendRevisionInfo repo)
+        False -> identityTransform
       assertEliminationTransform = case elem AllowAssert g4options of
         True -> identityTransform
         False -> disableAssertions
@@ -55,9 +55,9 @@ transformFn g4options repo code =
 transformAblaFn :: [G4ReleaseOption] -> GitRepo -> String -> IO String
 transformAblaFn g4options repo code =
   let initialTransform = identityTransform code >>= appendDefines
-      revisionInfoTransform = case elem NoRevisionInfo g4options of
-        True -> identityTransform
-        False -> (appendRevisionInfo repo)
+      revisionInfoTransform = case elem RevisionInfo g4options of
+        True -> (appendRevisionInfo repo)
+        False -> identityTransform
   in initialTransform >>= revisionInfoTransform
 
 releaseG4 :: GitRepo -> FilePath -> [G4Module] -> [G4ReleaseOption] -> IO ()
