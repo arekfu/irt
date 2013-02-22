@@ -195,7 +195,10 @@ mkModuleDefinition basedir pkgdir codename pkgname granularDeps = do
   moduleFiles <- getRecursiveContents (basedir </> pkgdir)
   let headers = headerFilesOnly moduleFiles
       sources = sourceFilesOnly moduleFiles
-      granDeps = concat [defaultGranDeps, (map g4moduleName granularDeps)]
+      prefix = "G4hadronic_" ++ codename ++ "_"
+      intGranDeps = map g4moduleName granularDeps
+      g4modulesGranDeps = map ((++) prefix) intGranDeps
+      granDeps = concat [defaultGranDeps, g4modulesGranDeps]
       globDeps = defaultGlobDeps
       newModule = G4Module cname name pkgdir headers sources granDeps globDeps
   return newModule
