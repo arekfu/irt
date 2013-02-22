@@ -183,7 +183,10 @@ defaultGranDeps = ["G4baryons", "G4bosons", "G4geometrymng",
                    "G4hadronic_xsect", "G4ions", "G4leptons",
                    "G4materials", "G4mesons", "G4partman",
                    "G4procman", "G4track", "G4volumes",
-                   "G4intercoms"]
+                   "G4intercoms", "G4had_preequ_exciton", "G4hadronic_deex_evaporation",
+                   "G4hadronic_deex_fermi_breakup", "G4hadronic_deex_handler", "G4hadronic_deex_management",
+                   "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util",
+                   "G4hadronic_mgt"]
 
 mkModuleDefinition :: FilePath -> FilePath -> String -> String -> [G4Module] -> IO G4Module
 mkModuleDefinition basedir pkgdir codename pkgname granularDeps = do
@@ -267,6 +270,8 @@ sourcesCMakeHeader = "#---------------------------------------------------------
 \include_directories(${CMAKE_SOURCE_DIR}/source/processes/management/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/track/include)\n\
 \include_directories(${CMAKE_SOURCE_DIR}/source/intercoms/include)\n\
+\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/pre_equilibrium/exciton_model/include)\n\
+\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/management/include)\n\
 \\n\
 \#\n\
 \# Define the Geant4 Module.\n\
