@@ -251,6 +251,8 @@ mkModuleDefinition basedir pkgdir codename pkgname granularDeps = do
 
 generateCMakeSources :: String -> G4Module -> String
 generateCMakeSources suffix g4mod = concat [sourcesCMakeHeader,
+                                     includeDirs,
+                                     sourcesCMakeInterlude,
                                      "GEANT4_DEFINE_MODULE(NAME " ++ moduleName ++ "\n",
                                      headerDefs,
                                      "\n",
@@ -262,6 +264,7 @@ generateCMakeSources suffix g4mod = concat [sourcesCMakeHeader,
                                      "\n",
                                      sourcesCMakeEnd]
   where moduleName = "G4hadronic_" ++ suffix ++ "_" ++ (g4moduleName g4mod)
+        includeDirs = specificIncludeDirsCMake g4mod
         appendEndl fname = "        " ++ fname ++ "\n"
         headerFiles = map takeFileName (g4moduleHeaders g4mod)
         headerFilesWithEndl = concat $ map appendEndl headerFiles
@@ -298,35 +301,123 @@ sourcesCMakeHeader = "#---------------------------------------------------------
 \# List external includes needed.\n\
 \include_directories(${CLHEP_INCLUDE_DIRS})\n\
 \\n\
-\# List internal includes needed.\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/geometry/management/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/geometry/volumes/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/global/HEPGeometry/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/global/HEPRandom/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/global/management/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/materials/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/particles/bosons/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/particles/hadrons/barions/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/particles/hadrons/ions/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/particles/hadrons/mesons/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/particles/leptons/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/particles/management/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/cross_sections/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/management/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/binary_cascade/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/im_r_matrix/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/inclxx/incl_physics/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/inclxx/utils/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/de_excitation/handler/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/pre_equilibrium/exciton_model/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/management/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/models/util/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/hadronic/util/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/processes/management/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/track/include)\n\
-\include_directories(${CMAKE_SOURCE_DIR}/source/intercoms/include)\n\
-\\n\
+\# List internal includes needed.\n"
+
+sourcesCMakeInterlude :: String
+sourcesCMakeInterlude = "\n\
 \#\n\
 \# Define the Geant4 Module.\n\
 \#\n\
 \include(Geant4MacroDefineModule)\n"
+
+includeDirToCMakeInclude :: String -> String
+includeDirToCMakeInclude dir = "include_directories(${CMAKE_SOURCE_DIR}/source/" ++ dir ++ ")\n"
+
+specificIncludeDirsCMake :: G4Module -> String
+specificIncludeDirsCMake g4mod = cmakeDirs
+  where cmakeDirs = concat cmakeList
+        cmakeList = map includeDirToCMakeInclude dirs
+        dirs = specificIncludeDirs moduleName
+        moduleName = g4moduleName g4mod
+
+specificIncludeDirs :: String -> [String]
+specificIncludeDirs "utils" = [ "geometry/management/include",
+                    "geometry/volumes/include",
+                    "global/HEPGeometry/include",
+                    "global/HEPRandom/include",
+                    "global/management/include",
+                    "materials/include",
+                    "particles/bosons/include",
+                    "particles/hadrons/barions/include",
+                    "particles/hadrons/ions/include",
+                    "particles/hadrons/mesons/include",
+                    "particles/leptons/include",
+                    "particles/management/include",
+                    "processes/hadronic/cross_sections/include",
+                    "processes/hadronic/management/include",
+                    "processes/hadronic/models/binary_cascade/include",
+                    "processes/hadronic/models/im_r_matrix/include",
+                    "processes/hadronic/models/pre_equilibrium/exciton_model/include",
+                    "processes/hadronic/models/management/include",
+                    "processes/hadronic/util/include",
+                    "processes/management/include",
+                    "track/include",
+                    "intercoms/include"
+                    ]
+specificIncludeDirs "physics" = [ "geometry/management/include",
+                    "geometry/volumes/include",
+                    "global/HEPGeometry/include",
+                    "global/HEPRandom/include",
+                    "global/management/include",
+                    "materials/include",
+                    "particles/bosons/include",
+                    "particles/hadrons/barions/include",
+                    "particles/hadrons/ions/include",
+                    "particles/hadrons/mesons/include",
+                    "particles/leptons/include",
+                    "particles/management/include",
+                    "processes/hadronic/cross_sections/include",
+                    "processes/hadronic/management/include",
+                    "processes/hadronic/models/binary_cascade/include",
+                    "processes/hadronic/models/im_r_matrix/include",
+                    "processes/hadronic/models/management/include",
+                    "processes/hadronic/util/include",
+                    "processes/management/include",
+                    "track/include",
+                    "intercoms/include",
+                    "processes/hadronic/management/include"
+                    ]
+specificIncludeDirs "interface" = [ "geometry/management/include",
+                    "geometry/volumes/include",
+                    "global/HEPGeometry/include",
+                    "global/HEPRandom/include",
+                    "global/management/include",
+                    "materials/include",
+                    "particles/bosons/include",
+                    "particles/hadrons/barions/include",
+                    "particles/hadrons/ions/include",
+                    "particles/hadrons/mesons/include",
+                    "particles/leptons/include",
+                    "particles/management/include",
+                    "processes/hadronic/cross_sections/include",
+                    "processes/hadronic/management/include",
+                    "processes/hadronic/models/binary_cascade/include",
+                    "processes/hadronic/models/im_r_matrix/include",
+                    "processes/hadronic/models/inclxx/incl_physics/include",
+                    "processes/hadronic/models/inclxx/utils/include",
+                    "processes/hadronic/models/de_excitation/handler/include",
+                    "processes/hadronic/models/pre_equilibrium/exciton_model/include",
+                    "processes/hadronic/models/management/include",
+                    "processes/hadronic/models/util/include",
+                    "processes/hadronic/util/include",
+                    "processes/management/include",
+                    "track/include",
+                    "intercoms/include"
+                    ]
+specificIncludeDirs _ = [ "geometry/management/include",
+                    "geometry/volumes/include",
+                    "global/HEPGeometry/include",
+                    "global/HEPRandom/include",
+                    "global/management/include",
+                    "materials/include",
+                    "particles/bosons/include",
+                    "particles/hadrons/barions/include",
+                    "particles/hadrons/ions/include",
+                    "particles/hadrons/mesons/include",
+                    "particles/leptons/include",
+                    "particles/management/include",
+                    "processes/hadronic/cross_sections/include",
+                    "processes/hadronic/management/include",
+                    "processes/hadronic/models/binary_cascade/include",
+                    "processes/hadronic/models/im_r_matrix/include",
+                    "processes/hadronic/models/inclxx/incl_physics/include",
+                    "processes/hadronic/models/inclxx/utils/include",
+                    "processes/hadronic/models/de_excitation/handler/include",
+                    "processes/hadronic/models/pre_equilibrium/exciton_model/include",
+                    "processes/hadronic/models/management/include",
+                    "processes/hadronic/models/util/include",
+                    "processes/hadronic/util/include",
+                    "processes/management/include",
+                    "track/include",
+                    "intercoms/include"
+                    ]
