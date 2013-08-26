@@ -192,6 +192,47 @@ defaultGranDeps = ["G4baryons", "G4bosons", "G4geometrymng",
                    "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util"
                    ]
 
+specificGranDeps :: String -> [String]
+specificGranDeps "physics" = [ "G4baryons", "G4bosons", "G4geometrymng",
+                 "G4globman",
+                 "G4hadronic_mgt", "G4hadronic_util", "G4hadronic_xsect",
+                 "G4ions", "G4leptons",
+                 "G4materials", "G4mesons", "G4partman",
+                 "G4procman", "G4track", "G4volumes",
+                 "G4intercoms",
+                 "G4had_preequ_exciton",
+                 "G4hadronic_deex_evaporation",
+                 "G4hadronic_deex_fermi_breakup", "G4hadronic_deex_handler", "G4hadronic_deex_management",
+                 "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util"
+                 ]
+specificGranDeps "utils" = [ "G4baryons", "G4bosons", "G4geometrymng",
+                 "G4globman",
+                 "G4ions", "G4leptons",
+                 "G4materials", "G4mesons", "G4partman",
+                 "G4procman", "G4track", "G4volumes",
+                 "G4intercoms",
+                 "G4had_mod_man",
+                 "G4had_preequ_exciton",
+                 "G4hadronic_mgt", "G4hadronic_util", "G4hadronic_xsect",
+                 "G4hadronic_deex_evaporation",
+                 "G4hadronic_deex_fermi_breakup", "G4hadronic_deex_handler", "G4hadronic_deex_management",
+                 "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util"
+                 ]
+specificGranDeps "interface" = [ "G4baryons", "G4bosons", "G4geometrymng",
+                 "G4globman",
+                 "G4hadronic_mgt", "G4hadronic_util", "G4hadronic_xsect",
+                 "G4ions", "G4leptons",
+                 "G4materials", "G4mesons", "G4partman",
+                 "G4procman", "G4track", "G4volumes",
+                 "G4intercoms",
+                 "G4had_preequ_exciton",
+                 "G4had_mod_man", "G4had_mod_util",
+                 "G4hadronic_deex_evaporation",
+                 "G4hadronic_deex_fermi_breakup", "G4hadronic_deex_handler", "G4hadronic_deex_management",
+                 "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util"
+                 ]
+specificGranDeps _ = defaultGranDeps
+
 mkModuleDefinition :: FilePath -> FilePath -> String -> String -> [G4Module] -> IO G4Module
 mkModuleDefinition basedir pkgdir codename pkgname granularDeps = do
   let  name = pkgname
@@ -202,7 +243,8 @@ mkModuleDefinition basedir pkgdir codename pkgname granularDeps = do
       prefix = "G4hadronic_" ++ codename ++ "_"
       intGranDeps = map g4moduleName granularDeps
       g4modulesGranDeps = map ((++) prefix) intGranDeps
-      granDeps = concat [defaultGranDeps, g4modulesGranDeps]
+      moduleGranDeps = specificGranDeps name
+      granDeps = concat [moduleGranDeps, g4modulesGranDeps]
       globDeps = defaultGlobDeps
       newModule = G4Module cname name pkgdir headers sources granDeps globDeps
   return newModule
