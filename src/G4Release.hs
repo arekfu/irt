@@ -45,7 +45,7 @@ transformFn g4options repo code =
         True -> identityTransform
         False -> (appendLicense licenseBoilerplate)
       revisionInfoTransform = case elem RevisionInfo g4options of
-        True -> (appendRevisionInfo repo)
+        True -> (appendRevisionInfo repo "INCL++")
         False -> identityTransform
       assertEliminationTransform = case elem AllowAssert g4options of
         True -> identityTransform
@@ -54,11 +54,17 @@ transformFn g4options repo code =
 
 transformAblaFn :: [G4ReleaseOption] -> GitRepo -> String -> IO String
 transformAblaFn g4options repo code =
-  let initialTransform = identityTransform code >>= appendDefines
+  let initialTransform = identityTransform code >>= appendDefinesABLAXX
+      licenseInfoTransform = case elem NoLicense g4options of
+        True -> identityTransform
+        False -> (appendLicense licenseBoilerplateABLAXX)
       revisionInfoTransform = case elem RevisionInfo g4options of
-        True -> (appendRevisionInfo repo)
+        True -> (appendRevisionInfo repo "ABLAXX")
         False -> identityTransform
-  in initialTransform >>= revisionInfoTransform
+      assertEliminationTransform = case elem AllowAssert g4options of
+        True -> identityTransform
+        False -> disableAssertions
+  in initialTransform >>= assertEliminationTransform >>= revisionInfoTransform >>= licenseInfoTransform
 
 releaseG4 :: GitRepo -> FilePath -> [G4Module] -> [G4ReleaseOption] -> IO ()
 releaseG4 repo targetdir modules g4options = do
@@ -74,6 +80,7 @@ releaseG4Abla repo targetdir g4mod g4options = do
 -- Apply transform (String -> IO String) to a code file:
 releaseFile :: FilePath -> (String -> IO String) -> FilePath -> IO ()
 releaseFile destinationDir transform file = do
+  putStrLn ("Processing " ++ file)
   code <- readFile file
   code' <- transform code
   let fileName = takeFileName file
@@ -120,6 +127,14 @@ appendDefines code = do
       code' = unlines codeText'
   return code'
 
+appendDefinesABLAXX :: String -> IO String
+appendDefinesABLAXX code = do
+  let codeText = lines code
+      defines = ["#define ABLAXX_IN_GEANT4_MODE 1\n", "#include \"globals.hh\"\n"]
+      codeText' = concat [defines, codeText]
+      code' = unlines codeText'
+  return code'
+
 appendLicense :: String -> String -> IO String
 appendLicense license code = do
   let licenseText = lines license
@@ -128,10 +143,10 @@ appendLicense license code = do
       code' = unlines combinedTexts
   return code'
 
-appendRevisionInfo :: GitRepo -> String -> IO String
-appendRevisionInfo repo code = do
+appendRevisionInfo :: GitRepo -> String -> String -> IO String
+appendRevisionInfo repo name code = do
   revStr <- buildGitRevisionString repo
-  let revText = lines $ "// INCL++ revision: " ++ revStr ++ "\n//\n"
+  let revText = lines $ "// " ++ name ++ " revision: " ++ revStr ++ "\n//\n"
       codeText = lines code
       combinedTexts = concat [revText, codeText]
       code' = unlines combinedTexts
@@ -169,6 +184,39 @@ licenseBoilerplate = "//\n\
 \// Alain Boudard, CEA\n\
 \// Sylvie Leray, CEA\n\
 \// Joseph Cugnon, University of Liege\n\
+\//\n"
+
+licenseBoilerplateABLAXX :: String
+licenseBoilerplateABLAXX = "//\n\
+\// ********************************************************************\n\
+\// * License and Disclaimer                                           *\n\
+\// *                                                                  *\n\
+\// * The  Geant4 software  is  copyright of the Copyright Holders  of *\n\
+\// * the Geant4 Collaboration.  It is provided  under  the terms  and *\n\
+\// * conditions of the Geant4 Software License,  included in the file *\n\
+\// * LICENSE and available at  http://cern.ch/geant4/license .  These *\n\
+\// * include a list of copyright holders.                             *\n\
+\// *                                                                  *\n\
+\// * Neither the authors of this software system, nor their employing *\n\
+\// * institutes,nor the agencies providing financial support for this *\n\
+\// * work  make  any representation or  warranty, express or implied, *\n\
+\// * regarding  this  software system or assume any liability for its *\n\
+\// * use.  Please see the license in the file  LICENSE  and URL above *\n\
+\// * for the full disclaimer and the limitation of liability.         *\n\
+\// *                                                                  *\n\
+\// * This  code  implementation is the result of  the  scientific and *\n\
+\// * technical work of the GEANT4 collaboration.                      *\n\
+\// * By using,  copying,  modifying or  distributing the software (or *\n\
+\// * any work based  on the software)  you  agree  to acknowledge its *\n\
+\// * use  in  resulting  scientific  publications,  and indicate your *\n\
+\// * acceptance of all terms of the Geant4 Software license.          *\n\
+\// ********************************************************************\n\
+\//\n\
+\// ABLAXX statistical de-excitation model\n\
+\// Pekka Kaitaniemi, HIP (translation)\n\
+\// Christelle Schmidt, IPNL (fission code)\n\
+\// Davide Mancusi, CEA (contact person INCL/ABLA)\n\
+\// Aatos Heikkinen, HIP (project coordination)\n\
 \//\n"
 
 -- G4 build system code generator
@@ -230,6 +278,14 @@ specificGranDeps "interface" = [ "G4baryons", "G4bosons", "G4geometrymng",
                  "G4hadronic_deex_evaporation",
                  "G4hadronic_deex_fermi_breakup", "G4hadronic_deex_handler", "G4hadronic_deex_management",
                  "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util"
+                 ]
+specificGranDeps "abla" = [ "G4baryons", "G4bosons", "G4geometrymng",
+                 "G4globman",
+                 "G4hadronic_mgt", "G4hadronic_util", "G4hadronic_xsect",
+                 "G4ions", "G4leptons",
+                 "G4materials", "G4mesons", "G4partman",
+                 "G4procman", "G4track", "G4volumes",
+                 "G4intercoms"
                  ]
 specificGranDeps _ = defaultGranDeps
 
@@ -364,8 +420,7 @@ specificIncludeDirs "physics" = [ "geometry/management/include",
                     "processes/hadronic/util/include",
                     "processes/management/include",
                     "track/include",
-                    "intercoms/include",
-                    "processes/hadronic/management/include"
+                    "intercoms/include"
                     ]
 specificIncludeDirs "interface" = [ "geometry/management/include",
                     "geometry/volumes/include",
@@ -391,6 +446,21 @@ specificIncludeDirs "interface" = [ "geometry/management/include",
                     "processes/hadronic/models/util/include",
                     "processes/hadronic/util/include",
                     "processes/management/include",
+                    "track/include",
+                    "intercoms/include"
+                    ]
+specificIncludeDirs "abla" = [ "geometry/management/include",
+                    "geometry/volumes/include",
+                    "global/HEPGeometry/include",
+                    "global/HEPRandom/include",
+                    "global/management/include",
+                    "materials/include",
+                    "particles/bosons/include",
+                    "particles/hadrons/barions/include",
+                    "particles/hadrons/ions/include",
+                    "particles/hadrons/mesons/include",
+                    "particles/leptons/include",
+                    "particles/management/include",
                     "track/include",
                     "intercoms/include"
                     ]

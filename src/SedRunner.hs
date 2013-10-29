@@ -6,6 +6,7 @@ module SedRunner (
 import System.IO
 import System.Process
 import System.Exit
+import Control.Exception(evaluate)
 
 data SedCommand = SedIntToG4Int
                 | SedFloatToG4Float
@@ -29,7 +30,7 @@ sedCommandArgs SedIntToG4Int = toG4TypeRegexp "int"
 sedCommandArgs SedFloatToG4Float = toG4TypeRegexp "float"
 sedCommandArgs SedDoubleToG4Double = toG4TypeRegexp "double"
 sedCommandArgs SedBoolToG4Bool = toG4TypeRegexp "bool"
-sedCommandArgs SedCommentAsserts = ["s/^\\s*assert/\\/\\/ assert/g"]
+sedCommandArgs SedCommentAsserts = ["s,^\\s*assert,// assert,g"]
 sedCommandArgs SedCommentIncludeCassert = ["s/#include \\+<cassert>/\\/\\/ #include <cassert>/g"]
 sedCommandArgs SedFixG4G4 = ["s/G4G4/G4/g"]
 sedCommandArgs SedFixUnsignedG4Int = ["s/unsigned\\ G4int/unsigned\\ int/g"]
@@ -71,16 +72,22 @@ runSed command inputData = do
   let sedArgs = sedCommandArgs command
       inPipe = CreatePipe
       outPipe = CreatePipe
-      errPipe = CreatePipe
-  (Just hInput, Just hOutput, Just hError, procHandle) <- createProcess (proc "sed" sedArgs) {std_in = inPipe, std_out = outPipe, std_err = errPipe}
+      commandName = show command
+      sedArgsString = show sedArgs
+  putStr $ "Running " ++ commandName ++ ": " ++ sedArgsString ++ "..."
+  hFlush stdout
+  (Just hInput, Just hOutput, _, procHandle) <- createProcess (proc "sed" sedArgs) {std_in = inPipe, std_out = outPipe}
   hPutStr hInput inputData
   hClose hInput
+  outputStr <- hGetContents hOutput
+  -- Must force evaluation of the output before evaluating the exitCode. Read
+  -- it here:
+  -- http://book.realworldhaskell.org/read/systems-programming-in-haskell.html
+  _ <- evaluate (length outputStr)
   exitCode <- waitForProcess procHandle
   if exitCode /= ExitSuccess
-    then do msg <- hGetContents hError
-            hClose hOutput
-            error $ "Sed reported an error: " ++ msg
-    else do outputStr <- hGetContents hOutput
-            hClose hError
+    then do hClose hOutput
+            error "sed reported an error"
+    else do putStrLn " completed"
             return outputStr
 

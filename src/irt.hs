@@ -36,7 +36,7 @@ g4release = G4Release { gitRepo = def &= help "INCL++ Git repository path"
                       }  &= help "Release INCL++ to Geant4"
 
 g4ablarelease :: CmdOptions
-g4ablarelease = G4AblaRelease { gitRepo = def &= help "INCL++ Git repository path (containing the ablaxx directory)"
+g4ablarelease = G4AblaRelease { gitRepo = def &= help "ABLAXX Git repository path (containing the ablaxx directory)"
                       , ignoreGitModifications = False &= help "Ignore modifications in the Git tree"
                       , g4Tree = def &= help "Geant4 checkout (main level)"
                       , g4options = [] &= help "(AllowAssert, NoG4Types, NoLicense, RevisionInfo)"
@@ -64,7 +64,7 @@ performG4Release repo targetDir g4opts = do
 
 performG4AblaRelease :: GitRepo -> FilePath -> [G4ReleaseOption] -> IO ()
 performG4AblaRelease repo targetDir g4opts = do
-  let ablaDir = (gitRepoPath repo) </> "ablaxx"
+  let ablaDir = gitRepoPath repo
       codename = "abla"
   g4AblaModule <- mkModuleDefinition ablaDir "" codename "abla" []
   releaseG4Abla repo targetDir g4AblaModule g4opts
@@ -88,8 +88,8 @@ runIrtCommand (G4AblaRelease gitpath ignoregitmodif g4opts g4sourcepath) = do
       targetDir = g4sourcepath </> "source/processes/hadronic/models/abla/"
   inclDirtyTree <- gitIsDirtyTree inclRepository
   inclRev <- buildGitRevisionString inclRepository
-  putStrLn $ "INCL++ repository path is: " ++ gitpath
-  putStrLn $ "INCL++ revision is: " ++ inclRev
+  putStrLn $ "ABLAXX repository path is: " ++ gitpath
+  putStrLn $ "ABLAXX revision is: " ++ inclRev
   putStrLn $ "Geant4 path is: " ++ g4sourcepath
   putStrLn $ "G4 release options: " ++ (show g4opts)
   if inclDirtyTree && (not ignoregitmodif)
