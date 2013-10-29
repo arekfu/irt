@@ -285,7 +285,12 @@ specificGranDeps "abla" = [ "G4baryons", "G4bosons", "G4geometrymng",
                  "G4ions", "G4leptons",
                  "G4materials", "G4mesons", "G4partman",
                  "G4procman", "G4track", "G4volumes",
-                 "G4intercoms"
+                 "G4intercoms",
+                 "G4had_preequ_exciton",
+                 "G4had_mod_man", "G4had_mod_util",
+                 "G4hadronic_deex_evaporation",
+                 "G4hadronic_deex_fermi_breakup", "G4hadronic_deex_handler", "G4hadronic_deex_management",
+                 "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util"
                  ]
 specificGranDeps _ = defaultGranDeps
 
@@ -461,6 +466,9 @@ specificIncludeDirs "abla" = [ "geometry/management/include",
                     "particles/hadrons/mesons/include",
                     "particles/leptons/include",
                     "particles/management/include",
+                    "processes/hadronic/models/management/include",
+                    "processes/hadronic/models/util/include",
+                    "processes/hadronic/models/de_excitation/handler/include",
                     "track/include",
                     "intercoms/include"
                     ]
