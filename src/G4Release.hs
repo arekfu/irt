@@ -64,7 +64,7 @@ transformAblaFn g4options repo code =
       assertEliminationTransform = case elem AllowAssert g4options of
         True -> identityTransform
         False -> disableAssertions
-  in initialTransform >>= assertEliminationTransform >>= revisionInfoTransform >>= licenseInfoTransform
+  in initialTransform >>= typeTransform >>= assertEliminationTransform >>= revisionInfoTransform >>= licenseInfoTransform
 
 releaseG4 :: GitRepo -> FilePath -> [G4Module] -> [G4ReleaseOption] -> IO ()
 releaseG4 repo targetdir modules g4options = do
