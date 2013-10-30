@@ -7,6 +7,7 @@ module GitRunner ( GitRepo(..)
 import System.IO
 import System.Process
 import System.Exit
+import Control.Exception(evaluate)
 
 data GitRepo = GitRepo { gitRepoPath :: FilePath
                        } deriving (Show, Eq)
@@ -45,10 +46,14 @@ runGit repo command = do
       err = CreatePipe
       d = Just repoDir
   (_, Just gitOutputStream, Just gitErrorStream, procHandle) <- createProcess (proc "git" gitArgs) {std_out = out, std_err = err,cwd = d}
+  gitOutputStr <- hGetContents gitOutputStream
+  -- Must force evaluation of the output before evaluating the exitCode. Read
+  -- it here:
+  -- http://book.realworldhaskell.org/read/systems-programming-in-haskell.html
+  _ <- evaluate (length gitOutputStr)
   exitCode <- waitForProcess procHandle
   case exitCode of
     ExitSuccess -> do
-      gitOutputStr <- hGetContents gitOutputStream
       let trimmedOutput | length gitOutputStr > 0 = init gitOutputStr
                         | otherwise               = gitOutputStr
       return (ExitSuccess, trimmedOutput)
