@@ -466,9 +466,12 @@ specificIncludeDirs "abla" = [ "geometry/management/include",
                     "particles/hadrons/mesons/include",
                     "particles/leptons/include",
                     "particles/management/include",
+                    "processes/management/include",
                     "processes/hadronic/models/management/include",
+                    "processes/hadronic/util/include",
                     "processes/hadronic/models/util/include",
                     "processes/hadronic/models/de_excitation/handler/include",
+                    "processes/hadronic/models/de_excitation/evaporation/include",
                     "track/include",
                     "intercoms/include"
                     ]
