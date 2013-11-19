@@ -80,7 +80,7 @@ releaseG4Abla repo targetdir g4mod g4options = do
 -- Apply transform (String -> IO String) to a code file:
 releaseFile :: FilePath -> (String -> IO String) -> FilePath -> IO ()
 releaseFile destinationDir transform file = do
-  putStrLn ("Processing " ++ file)
+--  putStrLn ("Processing " ++ file)
   code <- readFile file
   code' <- transform code
   let fileName = takeFileName file

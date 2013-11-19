@@ -72,9 +72,9 @@ runSed command inputData = do
   let sedArgs = sedCommandArgs command
       inPipe = CreatePipe
       outPipe = CreatePipe
-      commandName = show command
-      sedArgsString = show sedArgs
-  putStr $ "Running " ++ commandName ++ ": " ++ sedArgsString ++ "..."
+      --commandName = show command
+      --sedArgsString = show sedArgs
+--  putStr $ "Running " ++ commandName ++ ": " ++ sedArgsString ++ "..."
   hFlush stdout
   (Just hInput, Just hOutput, _, procHandle) <- createProcess (proc "sed" sedArgs) {std_in = inPipe, std_out = outPipe}
   hPutStr hInput inputData
@@ -88,6 +88,6 @@ runSed command inputData = do
   if exitCode /= ExitSuccess
     then do hClose hOutput
             error "sed reported an error"
-    else do putStrLn " completed"
+    else do --putStrLn " completed"
             return outputStr
 
