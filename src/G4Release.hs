@@ -179,11 +179,12 @@ licenseBoilerplate = "//\n\
 \// ********************************************************************\n\
 \//\n\
 \// INCL++ intra-nuclear cascade model\n\
-\// Pekka Kaitaniemi, CEA and Helsinki Institute of Physics\n\
-\// Davide Mancusi, CEA\n\
-\// Alain Boudard, CEA\n\
-\// Sylvie Leray, CEA\n\
-\// Joseph Cugnon, University of Liege\n\
+\// Alain Boudard, CEA-Saclay, France\n\
+\// Joseph Cugnon, University of Liege, Belgium\n\
+\// Jean-Christophe David, CEA-Saclay, France\n\
+\// Pekka Kaitaniemi, CEA-Saclay, France, and Helsinki Institute of Physics, Finland\n\
+\// Sylvie Leray, CEA-Saclay, France\n\
+\// Davide Mancusi, CEA-Saclay, France\n\
 \//\n"
 
 licenseBoilerplateABLAXX :: String
