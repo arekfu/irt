@@ -1,7 +1,8 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 module Main where
-import System.FilePath
 import System.Console.CmdArgs
+import System.Directory (getHomeDirectory)
+import System.FilePath (joinPath, splitPath, (</>))
 import GitRunner
 import G4Release
 
@@ -27,6 +28,13 @@ data SourceTransform = FileTransform { transformFileName :: FilePath
                      | TreeTransform { transformTreeDirectory :: FilePath
                                      }
                        deriving (Show, Eq)
+
+tildeExpansion :: FilePath -> IO FilePath
+tildeExpansion s = do
+    homeDir <- getHomeDirectory
+    return $ case splitPath s of
+        ("~/" : t) -> joinPath $ homeDir : t
+        _ -> s
 
 g4release :: CmdOptions
 g4release = G4Release { gitRepo = def &= help "INCL++ Git repository path"
@@ -71,26 +79,34 @@ performG4AblaRelease repo targetDir g4opts = do
 
 runIrtCommand :: CmdOptions -> IO ()
 runIrtCommand (G4Release gitpath ignoregitmodif g4opts g4sourcepath) = do
-  let inclRepository = GitRepo gitpath
-      targetDir = g4sourcepath </> "source/processes/hadronic/models/inclxx/"
+  let expandedGitPathIO = tildeExpansion gitpath
+      expandedG4SourcePathIO = tildeExpansion g4sourcepath
+  expandedGitPath <- expandedGitPathIO
+  expandedG4SourcePath <- expandedG4SourcePathIO
+  let inclRepository = GitRepo expandedGitPath
+      targetDir = expandedG4SourcePath </> "source/processes/hadronic/models/inclxx/"
   inclDirtyTree <- gitIsDirtyTree inclRepository
   inclRev <- buildGitRevisionString inclRepository
-  putStrLn $ "INCL++ repository path is: " ++ gitpath
+  putStrLn $ "INCL++ repository path is: " ++ expandedGitPath
   putStrLn $ "INCL++ revision is: " ++ inclRev
-  putStrLn $ "Geant4 path is: " ++ g4sourcepath
+  putStrLn $ "Geant4 path is: " ++ expandedG4SourcePath
   putStrLn $ "G4 release options: " ++ (show g4opts)
   if inclDirtyTree && (not ignoregitmodif)
     then abortG4Release
     else performG4Release inclRepository targetDir g4opts
 
 runIrtCommand (G4AblaRelease gitpath ignoregitmodif g4opts g4sourcepath) = do
-  let inclRepository = GitRepo gitpath
-      targetDir = g4sourcepath </> "source/processes/hadronic/models/abla/"
+  let expandedGitPathIO = tildeExpansion gitpath
+      expandedG4SourcePathIO = tildeExpansion g4sourcepath
+  expandedGitPath <- expandedGitPathIO
+  expandedG4SourcePath <- expandedG4SourcePathIO
+  let inclRepository = GitRepo expandedGitPath
+      targetDir = expandedG4SourcePath </> "source/processes/hadronic/models/abla/"
   inclDirtyTree <- gitIsDirtyTree inclRepository
   inclRev <- buildGitRevisionString inclRepository
-  putStrLn $ "ABLAXX repository path is: " ++ gitpath
+  putStrLn $ "ABLAXX repository path is: " ++ expandedGitPath
   putStrLn $ "ABLAXX revision is: " ++ inclRev
-  putStrLn $ "Geant4 path is: " ++ g4sourcepath
+  putStrLn $ "Geant4 path is: " ++ expandedG4SourcePath
   putStrLn $ "G4 release options: " ++ (show g4opts)
   if inclDirtyTree && (not ignoregitmodif)
     then abortG4Release
