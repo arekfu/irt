@@ -280,6 +280,7 @@ specificGranDeps "interface" = [ "G4baryons", "G4bosons", "G4geometrymng",
                  "G4hadronic_deex_fermi_breakup", "G4hadronic_deex_fission",
                  "G4hadronic_deex_handler", "G4hadronic_deex_management",
                  "G4hadronic_deex_multifragmentation", "G4hadronic_deex_photon_evaporation", "G4hadronic_deex_util"
+                 , "G4hadronic_abla_abla"
                  ]
 specificGranDeps "abla" = [ "G4baryons", "G4bosons", "G4geometrymng",
                  "G4globman",
@@ -452,6 +453,7 @@ specificIncludeDirs "interface" = [ "geometry/management/include",
                     "processes/hadronic/models/de_excitation/handler/include",
                     "processes/hadronic/models/de_excitation/management/include",
                     "processes/hadronic/models/de_excitation/util/include",
+                    "processes/hadronic/models/abla/include",
                     "processes/hadronic/models/pre_equilibrium/exciton_model/include",
                     "processes/hadronic/models/management/include",
                     "processes/hadronic/models/util/include",
