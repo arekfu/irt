@@ -342,7 +342,7 @@ generateCMakeSources suffix g4mod = concat [sourcesCMakeHeader,
 sourcesCMakeEnd :: String
 sourcesCMakeEnd = "LINK_LIBRARIES\
 \)\
-\# List any source specific properties here"
+\# List any source specific properties here\n"
 
 sourcesCMakeHeader :: String
 sourcesCMakeHeader = "#------------------------------------------------------------------------------\n\
