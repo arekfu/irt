@@ -59,7 +59,10 @@ Executable irt
   Ghc-options: -O2 -Wall
 
   -- Modules not exported by this package.
-  -- Other-modules:       
+  Other-modules:       FindFile
+                     , G4Release
+                     , GitRunner
+                     , SedRunner
   
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   -- Build-tools:         
